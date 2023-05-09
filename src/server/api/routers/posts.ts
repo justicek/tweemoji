@@ -47,8 +47,6 @@ export const postsRouter = createTRPCRouter({
       })
     ).map(filterUserForClient);
 
-    console.log('users: ', users);
-
     return posts.map((post) => {
       const author = users.find((user) => post.authorId === user.id);
 
@@ -71,7 +69,7 @@ export const postsRouter = createTRPCRouter({
   create: privateProcedure
     .input(
       z.object({
-        content: z.string().emoji().min(1).max(280)
+        content: z.string().emoji('Only emojies are allowed').min(1).max(280)
       })
     )
     .mutation(async ({ ctx, input }) => {
