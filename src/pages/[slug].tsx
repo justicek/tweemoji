@@ -3,6 +3,23 @@ import Head from 'next/head';
 import { api } from 'y/utils/api';
 import Image from 'next/image';
 
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
+    userId: props.userId
+  });
+
+  if (isLoading) return <LoadingPage />;
+  if (!data || data.length === 0) return <div>User has no posts</div>;
+
+  return (
+    <div className="flex flex-col">
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
+
 const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   const { data } = api.profile.getUserByUsername.useQuery({
     username
@@ -30,6 +47,7 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
           data.username ?? ''
         }`}</div>
         <div className="w-full border-b border-slate-400" />
+        <ProfileFeed userId={data.id} />
       </PageLayout>
     </>
   );
@@ -41,6 +59,8 @@ import superjson from 'superjson';
 import { type GetStaticProps } from 'next';
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import { PageLayout } from 'y/components/layout';
+import { LoadingPage } from 'y/components/loading';
+import { PostView } from 'y/components/postView';
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const ssg = createServerSideHelpers({
