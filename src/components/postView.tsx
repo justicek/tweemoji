@@ -4,6 +4,9 @@ import Link from 'next/link';
 import type { RouterOutputs } from 'y/utils/api';
 
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 type PostWithUser = RouterOutputs['posts']['getAll'][number];
 
