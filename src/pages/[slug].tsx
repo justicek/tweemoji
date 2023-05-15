@@ -2,6 +2,11 @@ import { type NextPage } from 'next';
 import Head from 'next/head';
 import { api } from 'y/utils/api';
 import Image from 'next/image';
+import { type GetStaticProps } from 'next';
+import { PageLayout } from 'y/components/layout';
+import { LoadingPage } from 'y/components/loading';
+import { PostView } from 'y/components/postView';
+import { generateSSGHelper } from 'y/server/helpers/ssgHelper';
 
 const ProfileFeed = (props: { userId: string }) => {
   const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
@@ -53,28 +58,13 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
   );
 };
 
-import { appRouter } from 'y/server/api/root';
-import { prisma } from 'y/server/db';
-import superjson from 'superjson';
-import { type GetStaticProps } from 'next';
-import { createServerSideHelpers } from '@trpc/react-query/server';
-import { PageLayout } from 'y/components/layout';
-import { LoadingPage } from 'y/components/loading';
-import { PostView } from 'y/components/postView';
-
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null },
-    transformer: superjson
-  });
+  const ssg = generateSSGHelper();
 
   const slug = context.params?.slug;
-
   if (typeof slug !== 'string') throw new Error('no slug');
 
   const username = slug.replace('@', '');
-
   await ssg.profile.getUserByUsername.prefetch({ username });
 
   return {
