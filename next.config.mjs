@@ -19,6 +19,15 @@ const config = {
   i18n: {
     locales: ['en'],
     defaultLocale: 'en'
-  }
+  },
+
+  // speed up vercel builds - we're doing these checks in github CI
+  typescript: {
+    ignoreBuildErrors: true
+  },
+  eslint: {
+    ignoreDuringBuilds: true
+  },
+  swcMinify: true
 };
 export default config;
